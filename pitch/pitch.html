@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Alpha Agent — Synthesis Pitch</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0;padding:0;box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif;background:#0a0a0f;color:#fff;overflow:hidden; }
+        .slide { width:100vw;height:100vh;display:none;flex-direction:column;justify-content:center;align-items:center;padding:60px 80px;position:relative; }
+        .slide.active { display:flex; }
+        .slide-num { position:absolute;bottom:30px;right:40px;font-size:1em;color:rgba(255,255,255,0.2);font-weight:800; }
+        .logo { position:absolute;top:30px;left:40px;font-size:1.1em;font-weight:800;color:rgba(255,255,255,0.3);letter-spacing:2px; }
+        .crops-tag { position:absolute;top:30px;right:40px;font-size:0.75em;padding:6px 14px;border-radius:20px;background:rgba(255,183,77,0.15);color:#ffb74d;font-weight:700;letter-spacing:1px; }
+        h1 { font-size:3.5em;font-weight:900;line-height:1.1;margin-bottom:20px; }
+        h2 { font-size:2.2em;font-weight:800;margin-bottom:25px; }
+        .sub { font-size:1.2em;color:rgba(255,255,255,0.5);line-height:1.8;max-width:700px;text-align:center; }
+        .accent { color:#ffb74d; }
+        .green { color:#66bb6a; }
+        .blue { color:#5c9aff; }
+        .red { color:#ef5350; }
+        .purple { color:#ce93d8; }
+        .dim { color:rgba(255,255,255,0.35); }
+        .card-row { display:flex;gap:25px;margin-top:30px;width:90%;max-width:1100px; }
+        .card { flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:30px 25px;text-align:center; }
+        .card h3 { font-size:1.2em;margin:12px 0 8px;font-weight:700; }
+        .card p { font-size:0.9em;color:rgba(255,255,255,0.5);line-height:1.6; }
+        .card .icon { font-size:2.5em;margin-bottom:5px; }
+        .card.highlight { border-color:rgba(255,183,77,0.4);background:rgba(255,183,77,0.06); }
+        .arrow-between { font-size:2em;color:rgba(255,255,255,0.15);display:flex;align-items:center; }
+        .code-block { background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:25px 30px;font-family:'Consolas',monospace;font-size:0.85em;text-align:left;line-height:1.8;max-width:750px;width:85%;color:rgba(255,255,255,0.7); }
+        .code-block .hl { color:#ffb74d;font-weight:700; }
+        .code-block .val { color:#ce93d8; }
+        .code-block .ok { color:#66bb6a; }
+        .code-block .cm { color:rgba(255,255,255,0.25); }
+        .flow-line { display:flex;align-items:center;gap:12px;margin-top:30px;flex-wrap:wrap;justify-content:center; }
+        .flow-box { padding:14px 24px;border-radius:12px;font-weight:700;font-size:0.95em; }
+        .flow-arrow { font-size:1.5em;color:rgba(255,255,255,0.2); }
+        .crops-grid { display:grid;grid-template-columns:1fr 1fr;gap:15px;width:85%;max-width:900px;margin-top:20px; }
+        .crops-item { padding:20px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06); }
+        .crops-item .letter { font-size:2em;font-weight:900;margin-bottom:8px; }
+        .crops-item h4 { font-size:1em;margin-bottom:6px;color:rgba(255,255,255,0.8); }
+        .crops-item p { font-size:0.8em;color:rgba(255,255,255,0.4);line-height:1.5; }
+
+        .gauge-container { display:flex;gap:30px;margin-top:25px; }
+        .gauge { text-align:center;padding:20px 30px;border:1px solid rgba(255,255,255,0.08);border-radius:14px;background:rgba(255,255,255,0.02); }
+        .gauge .num { font-size:3em;font-weight:900; }
+        .gauge .label { font-size:0.8em;color:rgba(255,255,255,0.3);margin-top:5px; }
+
+        @keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+        .slide.active > * { animation:fadeUp 0.6s ease-out both; }
+        .slide.active > *:nth-child(2) { animation-delay:0.15s; }
+        .slide.active > *:nth-child(3) { animation-delay:0.3s; }
+        .slide.active > *:nth-child(4) { animation-delay:0.45s; }
+        .slide.active > *:nth-child(5) { animation-delay:0.6s; }
+        #start-overlay { position:fixed;inset:0;background:#0a0a0f;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer; }
+        #start-overlay .play-btn { font-size:4em;font-weight:900;padding:25px 55px;border:3px solid rgba(255,255,255,0.3);border-radius:18px;color:#fff;letter-spacing:3px;transition:all 0.3s; }
+        #start-overlay:hover .play-btn { border-color:#ffb74d;color:#ffb74d; }
+        #progress { position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,#ffb74d,#ef5350);z-index:100;transition:width 0.5s ease; }
+    </style>
+</head>
+<body>
+<div id="progress" style="width:0%"></div>
+
+<div id="start-overlay" onclick="startPitch()">
+    <div style="font-size:1.2em;color:rgba(255,255,255,0.3);margin-bottom:30px;letter-spacing:3px;">THE SYNTHESIS HACKATHON 2026</div>
+    <div class="play-btn">▶ NEWS ALPHA AGENT</div>
+    <div style="font-size:0.9em;color:rgba(255,255,255,0.2);margin-top:25px;">Faster than Bloomberg · Click to begin</div>
+</div>
+
+<!-- S1: Hook -->
+<div class="slide" id="s1">
+    <div class="logo">📰 NEWS ALPHA</div>
+    <div class="slide-num">01 / 08</div>
+    <h1>What if your agent<br>knew the news<br><span class="accent">before</span> the market?</h1>
+    <p class="sub">
+        Bloomberg costs $24K/year. News APIs are slow and rate-limited.<br>
+        Your AI agent deserves faster, cheaper, private intelligence.
+    </p>
+</div>
+
+<!-- S2: Problem -->
+<div class="slide" id="s2">
+    <div class="logo">📰 NEWS ALPHA</div>
+    <div class="slide-num">02 / 08</div>
+    <h2>The <span class="red">Information Gap</span></h2>
+    <div class="card-row">
+        <div class="card">
+            <div class="icon">💰</div>
+            <h3>Bloomberg</h3>
+            <p>$24,000/year<br>Designed for humans<br>Not agent-compatible</p>
+            <div style="margin-top:10px;font-size:0.85em;color:rgba(239,83,80,0.6);">Too expensive</div>
+        </div>
+        <div class="card">
+            <div class="icon">🐢</div>
+            <h3>News APIs</h3>
+            <p>Rate-limited<br>15-30 min delay<br>No analysis layer</p>
+            <div style="margin-top:10px;font-size:0.85em;color:rgba(239,83,80,0.6);">Too slow</div>
+        </div>
+        <div class="card">
+            <div class="icon">🕵️</div>
+            <h3>Proprietary Sources</h3>
+            <p>Shipping data, commodity flows<br>Geopolitical whispers<br>Locked behind walls</p>
+            <div style="margin-top:10px;font-size:0.85em;color:rgba(239,83,80,0.6);">Inaccessible</div>
+        </div>
+    </div>
+</div>
+
+<!-- S3: Solution -->
+<div class="slide" id="s3">
+    <div class="logo">📰 NEWS ALPHA</div>
+    <div class="slide-num">03 / 08</div>
+    <h2>Encapsulated <span class="accent">Intelligence</span></h2>
+    <p class="sub" style="margin-bottom:25px;">Proprietary sources stay private. Only the signal is sold.</p>
+    <div class="code-block">
+<span class="cm">// Agent B wants a trading signal</span>
+<span class="hl">POST</span> /signal  <span class="cm">// x402 micropayment: $0.005</span>
+{
+  "market": <span class="val">"commodities"</span>,
+  "sector": <span class="val">"oil"</span>
+}
+
+<span class="cm">// News Alpha Agent returns:</span>
+{
+  "signal": {
+    "direction": <span class="ok">"LONG"</span>,
+    "confidence": <span class="hl">87</span>,
+    "timeframe":  <span class="val">"4h"</span>,
+    "reasoning":  <span class="val">"Major port disruption detected. Supply shock."</span>
+  },
+  "sources": <span class="cm">"[REDACTED — proprietary]"</span>,
+  "analysisHash": <span class="hl">"0xa7b3..."</span>  <span class="cm">// On-chain verifiable</span>
+}
+    </div>
+    <div style="margin-top:15px;font-size:0.85em;color:rgba(255,255,255,0.3);">
+        You get the signal. Never the source. Never the recipe.
+    </div>
+</div>
+
+<!-- S4: Safety -->
+<div class="slide" id="s4">
+    <div class="logo">📰 NEWS ALPHA</div>
+    <div class="crops-tag">🛡️ YIELD-ONLY TRADING</div>
+    <div class="slide-num">04 / 08</div>
+    <h2>The <span class="green">stETH Safety</span> Mechanism</h2>
+    <p class="sub" style="margin-bottom:20px;">Principal is locked. Only yield trades. Maximum loss = interest earned.</p>
+    <div class="card-row" style="max-width:900px;">
+        <div class="card" style="border-color:rgba(92,154,255,0.3);">
+            <div class="icon">🏦</div>
+            <h3 class="blue">Treasury</h3>
+            <p>1000 stETH locked<br>~3-4% APY<br><strong style="color:#5c9aff;">= ~$40/year yield</strong></p>
+            <div style="margin-top:10px;font-size:0.8em;color:rgba(255,255,255,0.25);">Principal NEVER touched</div>
+        </div>
+        <div class="arrow-between">→</div>
+        <div class="card highlight">
+            <div class="icon">📊</div>
+            <h3 class="accent">Trading Budget</h3>
+            <p>Only yield flows to trading<br>Win → reinvest<br>Lose → only lose yield</p>
+            <div style="margin-top:10px;font-size:0.9em;color:#66bb6a;font-weight:700;">Max loss = $40</div>
+        </div>
+        <div class="arrow-between">→</div>
+        <div class="card" style="border-color:rgba(102,187,106,0.3);">
+            <div class="icon">📈</div>
+            <h3 class="green">Credit Score</h3>
+            <p>Every trade on Base<br>Win/loss ratio on-chain<br><strong style="color:#66bb6a;">Verifiable track record</strong></p>
+        </div>
+    </div>
+</div>
+
+<!-- S5: Privacy -->
+<div class="slide" id="s5">
+    <div class="logo">📰 NEWS ALPHA</div>
+    <div class="slide-num">05 / 08</div>
+    <h2>Private Cognition, <span class="accent">Public Action</span></h2>
+    <div class="card-row" style="max-width:900px;">
+        <div class="card highlight" style="flex:1.5;">
+            <div style="font-size:0.7em;color:#ffb74d;font-weight:700;letter-spacing:2px;margin-bottom:10px;">PRIVATE (VENICE)</div>
+            <div class="icon">🔐</div>
+            <h3>Zero-Log AI Inference</h3>
+            <p style="text-align:left;padding:0 10px;">
+                • News analysis runs on Venice AI<br>
+                • <strong style="color:#ffb74d;">No data retention. No logs.</strong><br>
+                • OpenAI-compatible API<br>
+                • Strategy cannot be reverse-engineered<br>
+                • Even Venice doesn't know your trades
+            </p>
+        </div>
+        <div class="arrow-between" style="flex-direction:column;gap:5px;">
+            <span>→</span>
+            <span style="font-size:0.5em;color:rgba(255,255,255,0.2);">Signal only</span>
+        </div>
+        <div class="card" style="flex:1;">
+            <div style="font-size:0.7em;color:#66bb6a;font-weight:700;letter-spacing:2px;margin-bottom:10px;">PUBLIC (BASE L2)</div>
+            <div class="icon">⛓️</div>
+            <h3>On-Chain Trades</h3>
+            <p>
+                TX hash visible<br>
+                Win/loss ratio public<br>
+                Credit score grows<br><br>
+                <strong style="color:#66bb6a;">Trustworthy</strong>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- S6: Business Model -->
+<div class="slide" id="s6">
+    <div class="logo">📰 NEWS ALPHA</div>
+    <div class="slide-num">06 / 08</div>
+    <h2>Two Revenue Streams</h2>
+    <div class="card-row" style="max-width:900px;">
+        <div class="card highlight">
+            <div class="icon">🧠</div>
+            <h3 class="accent">Sell Intelligence</h3>
+            <p>Other agents pay x402 per signal<br>$0.005 per call × 10K calls/day<br><strong class="accent">= $50/day passive</strong></p>
+        </div>
+        <div class="card" style="border-color:rgba(102,187,106,0.3);">
+            <div class="icon">📈</div>
+            <h3 class="green">Trade on Signals</h3>
+            <p>Agent trades its own signals<br>stETH yield funds trades<br><strong class="green">Compound returns</strong></p>
+        </div>
+    </div>
+    <div style="margin-top:25px;font-size:0.95em;color:rgba(255,255,255,0.3);">
+        Later: instantiate more sources. Shipping data. Satellite imagery. Social sentiment.<br>
+        <strong style="color:rgba(255,255,255,0.5);">Each source = a new revenue stream.</strong>
+    </div>
+</div>
+
+<!-- S7: CROPS -->
+<div class="slide" id="s7">
+    <div class="logo">📰 NEWS ALPHA</div>
+    <div class="crops-tag">🌾 CROPS</div>
+    <div class="slide-num">07 / 08</div>
+    <h2>Built for CROPS</h2>
+    <div class="crops-grid">
+        <div class="crops-item">
+            <div class="letter accent">C</div>
+            <h4>Censorship Resistance</h4>
+            <p>All trades on Base L2. No platform can freeze strategies or confiscate funds.</p>
+        </div>
+        <div class="crops-item">
+            <div class="letter green">O</div>
+            <h4>Open Source</h4>
+            <p>Signal evaluation framework is open. Anyone can audit the trading logic. Sources stay private.</p>
+        </div>
+        <div class="crops-item">
+            <div class="letter accent">P</div>
+            <h4>Privacy</h4>
+            <p>Venice no-log inference. Trading strategy cannot be extracted from any log. Sources sealed.</p>
+        </div>
+        <div class="crops-item">
+            <div class="letter blue">S</div>
+            <h4>Security</h4>
+            <p>stETH principal protection. Yield-only trading. If all services go offline, agent holds stETH safely.</p>
+        </div>
+    </div>
+</div>
+
+<!-- S8: Final -->
+<div class="slide" id="s8">
+    <div class="logo">📰 NEWS ALPHA</div>
+    <div class="slide-num">08 / 08</div>
+    <h1 style="font-size:2.8em;">Faster than Bloomberg.<br>Cheaper than analysts.<br><span class="accent">Available 24/7.</span></h1>
+    <p class="sub" style="margin-top:15px;margin-bottom:25px;">
+        Private intelligence. Public accountability.<br>
+        The agent earns its own operating budget from yield.
+    </p>
+    <div class="gauge-container">
+        <div class="gauge">
+            <div class="num accent">$0.005</div>
+            <div class="label">per signal</div>
+        </div>
+        <div class="gauge">
+            <div class="num green">0%</div>
+            <div class="label">principal risk</div>
+        </div>
+        <div class="gauge">
+            <div class="num blue">24/7</div>
+            <div class="label">always on</div>
+        </div>
+    </div>
+    <div style="margin-top:30px;font-size:0.8em;color:rgba(255,255,255,0.2);">
+        Wu Xi · Agent #34680 · Harness: Antigravity (Gemini) · github.com/wu1wu/news-alpha-agent
+    </div>
+</div>
+
+<script>
+    const TOTAL=8;let current=0;let timer=null;
+    function showSlide(n){document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));const s=document.getElementById('s'+n);if(s){s.classList.add('active');current=n;document.getElementById('progress').style.width=((n/TOTAL)*100)+'%';}clearTimeout(timer);if(n<TOTAL)timer=setTimeout(()=>showSlide(n+1),12000);}
+    function startPitch(){document.getElementById('start-overlay').style.display='none';showSlide(1);}
+    document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '){clearTimeout(timer);if(current<TOTAL)showSlide(current+1);}else if(e.key==='ArrowLeft'){clearTimeout(timer);if(current>1)showSlide(current-1);}});
+    document.addEventListener('click',e=>{if(document.getElementById('start-overlay').style.display==='none'){clearTimeout(timer);if(current<TOTAL)showSlide(current+1);}});
+</script>
+</body>
+</html>
