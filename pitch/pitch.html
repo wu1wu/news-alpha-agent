@@ -58,15 +58,29 @@
         #start-overlay .play-btn { font-size:4em;font-weight:900;padding:25px 55px;border:3px solid rgba(255,255,255,0.3);border-radius:18px;color:#fff;letter-spacing:3px;transition:all 0.3s; }
         #start-overlay:hover .play-btn { border-color:#ffb74d;color:#ffb74d; }
         #progress { position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,#ffb74d,#ef5350);z-index:100;transition:width 0.5s ease; }
+
+        /* Fake cursor */
+        #fake-cursor { position:fixed;z-index:10000;pointer-events:none;width:24px;height:24px;display:none; }
+        #fake-cursor .cursor-dot { width:24px;height:24px;border-radius:50%;background:rgba(255,183,77,0.7);border:2px solid rgba(255,255,255,0.8);box-shadow:0 0 20px rgba(255,183,77,0.5);transition:transform 0.15s; }
+        #fake-cursor.clicking .cursor-dot { transform:scale(0.6); }
+        #fake-cursor .click-ring { position:absolute;top:50%;left:50%;width:0;height:0;border-radius:50%;background:rgba(255,183,77,0.3);transform:translate(-50%,-50%);opacity:0; }
+        #fake-cursor.clicking .click-ring { animation:clickRipple 0.5s ease-out; }
+        @keyframes clickRipple { 0%{width:0;height:0;opacity:0.6} 100%{width:60px;height:60px;opacity:0} }
+        @media print {
+            body { overflow: visible; }
+            #start-overlay, #progress, #fake-cursor { display: none !important; }
+            .slide { display: flex !important; page-break-after: always; width: 100vw; height: 100vh; position: relative; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .slide:last-of-type { page-break-after: avoid; }
+        }
     </style>
 </head>
 <body>
 <div id="progress" style="width:0%"></div>
 
-<div id="start-overlay" onclick="startPitch()">
+<div id="start-overlay" onclick="startCountdown()">
     <div style="font-size:1.2em;color:rgba(255,255,255,0.3);margin-bottom:30px;letter-spacing:3px;">THE SYNTHESIS HACKATHON 2026</div>
     <div class="play-btn">▶ NEWS ALPHA AGENT</div>
-    <div style="font-size:0.9em;color:rgba(255,255,255,0.2);margin-top:25px;">Faster than Bloomberg · Click to begin</div>
+    <div id="countdown" style="font-size:5em;font-weight:900;color:#ffb74d;margin-top:30px;min-height:80px;">Click to start</div>
 </div>
 
 <!-- S1: Hook -->
@@ -141,6 +155,7 @@
     <div style="margin-top:15px;font-size:0.85em;color:rgba(255,255,255,0.3);">
         You get the signal. Never the source. Never the recipe.
     </div>
+    <img src="img/news_trading.png" style="max-height:80px;border-radius:10px;margin-top:10px;opacity:0.5;" alt="Trading">
 </div>
 
 <!-- S4: Safety -->
@@ -229,6 +244,7 @@
         Later: instantiate more sources. Shipping data. Satellite imagery. Social sentiment.<br>
         <strong style="color:rgba(255,255,255,0.5);">Each source = a new revenue stream.</strong>
     </div>
+    <img src="img/agent_economy.png" style="max-height:80px;border-radius:10px;margin-top:10px;opacity:0.5;" alt="Economy">
 </div>
 
 <!-- S7: CROPS -->
@@ -285,16 +301,43 @@
         </div>
     </div>
     <div style="margin-top:30px;font-size:0.8em;color:rgba(255,255,255,0.2);">
-        Wu Xi · Agent #34680 · Harness: Antigravity (Gemini) · github.com/wu1wu/news-alpha-agent
+        Wu Xi · Agent #34680 · Harness: Gemini · github.com/wu1wu/news-alpha-agent
     </div>
 </div>
 
+<!-- Fake cursor -->
+<div id="fake-cursor"><div class="cursor-dot"></div><div class="click-ring"></div></div>
+
 <script>
-    const TOTAL=8;let current=0;let timer=null;
-    function showSlide(n){document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));const s=document.getElementById('s'+n);if(s){s.classList.add('active');current=n;document.getElementById('progress').style.width=((n/TOTAL)*100)+'%';}clearTimeout(timer);if(n<TOTAL)timer=setTimeout(()=>showSlide(n+1),12000);}
-    function startPitch(){document.getElementById('start-overlay').style.display='none';showSlide(1);}
-    document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '){clearTimeout(timer);if(current<TOTAL)showSlide(current+1);}else if(e.key==='ArrowLeft'){clearTimeout(timer);if(current>1)showSlide(current-1);}});
-    document.addEventListener('click',e=>{if(document.getElementById('start-overlay').style.display==='none'){clearTimeout(timer);if(current<TOTAL)showSlide(current+1);}});
+    const TOTAL=8; let current=0; let currentAudio=null; let advanceTimer=null;
+    const audioFiles=[null,'na_slide_01.mp3','na_slide_02.mp3','na_slide_03.mp3','na_slide_04.mp3','na_slide_05.mp3','na_slide_06.mp3','na_slide_07.mp3','na_slide_08.mp3'];
+
+    function stopAll(){if(currentAudio){currentAudio.onended=null;currentAudio.onerror=null;currentAudio.pause();currentAudio=null;}clearTimeout(advanceTimer);}
+    function scheduleAdvance(ms){clearTimeout(advanceTimer);if(current<TOTAL){advanceTimer=setTimeout(()=>{advanceTimer=null;showSlide(current+1);},ms);}}
+
+    function showSlide(n){
+        stopAll();
+        document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));
+        const s=document.getElementById('s'+n);
+        if(!s)return;
+        s.classList.add('active');current=n;
+        document.getElementById('progress').style.width=((n/TOTAL)*100)+'%';
+        const af=audioFiles[n];
+        if(af){
+            currentAudio=new Audio(af);
+            currentAudio.onended=()=>{currentAudio=null;scheduleAdvance(3000);};
+            currentAudio.onerror=()=>{currentAudio=null;scheduleAdvance(8000);};
+            currentAudio.play().catch(()=>{currentAudio=null;scheduleAdvance(8000);});
+        } else { scheduleAdvance(10000); }
+    }
+
+    function startCountdown(){
+        const overlay=document.getElementById('start-overlay');
+        overlay.onclick=null;
+        const cd=document.getElementById('countdown');
+        let count=5; cd.textContent=count;
+        const t=setInterval(()=>{count--;if(count>0){cd.textContent=count;}else{clearInterval(t);overlay.style.display='none';showSlide(1);}},1000);
+    }
 </script>
 </body>
 </html>
