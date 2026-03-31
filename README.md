@@ -1,5 +1,16 @@
 # 📰 News Alpha Agent
 
+## 🏆 Built for PL_Genesis Hackathon
+
+This project is officially submitted to the **PL_Genesis: Frontiers of Collaboration** hackathon (Existing Code Track). 
+
+### 🔧 Sponsor Track Integrations:
+1. **Ethereum Foundation: Agents With Receipts (ERC-8004)**
+   - **How it's used**: The agent works as a fully verifiable autonomous actor on Base. We use ERC-8004 to build trading reputation and credit history on-chain.
+   - **Verification**: BaseScan TX Hash `0x8d930986438c3c526fc67de9a99d734e314a7c4b7747ccc83b13555b39a5706a`
+2. **Protocol Labs: Crypto**
+   - **How it's used**: Autonomous news detection and trading loop. StETH treasury wrapper ensures principal safety while the agent trades autonomously using yields.
+
 > **Encapsulated news intelligence as a service for other AI agents.**
 
 Fast, private, actionable — the News Alpha Agent wraps proprietary news analysis into a sellable intelligence service. Other agents pay (via x402) to receive trading signals derived from real-time news. The specific news sources stay private; only the intelligence output is sold.
